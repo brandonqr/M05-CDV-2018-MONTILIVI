@@ -8,14 +8,14 @@ namespace PracticaPersona
 {
     class Persona
     {
-        private string nombre;
-        private string dataNaixement;
-        private string nif;
-        private char sexe;
-        private double pes;
-        private double alçada;
-
-
+        //atributos
+        private string nom = "";
+        private string dataNaixement = "";
+        private string nif = "";
+        private char sexe = 'H';
+        private double pes = 0;
+        private double alçada = 0;
+        #region MetodosPublicos
         public string calcularIMC()
         {
             double resultat = pes / (Math.Pow(alçada, 2));
@@ -39,41 +39,98 @@ namespace PracticaPersona
         }
         public bool esMajorEdat()
         {
-            bool retornar = false;
-            if(edat() > 18)
-            {
-                retornar = true;
-            }
-            else{
-                retornar = false;
-            }
-            return retornar;
+            return (edat() > 18) ? true : false;
         }
+        //metods publicos mios
+        public string entrarNif()
+        {
+            while (!nifCorrecte(nif))
+            {
+                Console.WriteLine("Entra Nif 11111111H: ");
+                nif = Console.ReadLine();
+                //nif = (nifCorrecte(nif)) ? nif : nif;
+            }
+            return nif;
+        }
+        public bool esHoD(char sexe)
+        {
+            bool trobat = false;
+            if (sexe.ToString().ToUpper() == "H" || sexe.ToString().ToUpper() == "D")
+            {
+                trobat = true;
+            }
+            return trobat;
+        }
+        private string entrarAño(string dataNaixement)
+        {
+            bool trobat = false;
+            DateTime fecha = DateTime.Now;
+            int añoActual = fecha.Year;
+            while (!trobat)
+            {
+                Console.WriteLine("Entra Data Naixement DD/MM/AAAA: ");
+                dataNaixement = Console.ReadLine();
+                string[] camposFecha = dataNaixement.Split('/');
+                try
+                {
 
+                    int dia = Int32.Parse(camposFecha[0]);
+                    int mes = Int32.Parse(camposFecha[1]);
+                    int año = Int32.Parse(camposFecha[2]);
+                    int diasMes = DateTime.DaysInMonth(año, mes);
+                    if (dia <= diasMes && mes < 13 && año <= añoActual)
+                    {
+                        trobat = true;
+                    }
+                }
+                catch (Exception) { }
 
-        public string Nombre
+            }
+            return dataNaixement;
+        }
+        private double introducirDouble(string cadena)
+        {
+            double numero = -1;
+            while (!(valorPositivo(numero)))
+            {
+                Console.WriteLine(cadena);
+                try { numero = Convert.ToDouble(Console.ReadLine()); }
+                catch (Exception) { }
+            }
+            return numero;
+        }
+        private static bool valorPositivo(double valor)
+        {
+            return (valor > 0) ? true : false;
+        }
+        #endregion
+        #region Propietats
+        public string Nom
         {
             get
             {
-                return nombre;
+                return nom;
             }
 
             set
             {
-                nombre = value;
+                nom = value;
             }
         }
 
-        public string DNaixement
+        public string DataNaixement
         {
             get
             {
-                return dNaixement;
+                return dataNaixement;
             }
 
             set
             {
-                dNaixement = value;
+                if (value == "")
+                    dataNaixement = entrarAño(value);
+                else
+                    dataNaixement = value;
             }
         }
 
@@ -86,7 +143,10 @@ namespace PracticaPersona
 
             set
             {
-                nif = value;
+                if (nifCorrecte(value))
+                    nif = value;
+                else
+                    entrarNif();
             }
         }
 
@@ -99,7 +159,7 @@ namespace PracticaPersona
 
             set
             {
-                sexe = value;
+                sexe = esHoD(value) ? value : 'H';
             }
         }
 
@@ -112,7 +172,7 @@ namespace PracticaPersona
 
             set
             {
-                pes = value;
+                pes = (value == 0) ? introducirDouble("Entra Pes") : value;
             }
         }
 
@@ -125,18 +185,72 @@ namespace PracticaPersona
 
             set
             {
-                alçada = value;
+                alçada = (value == 0) ? introducirDouble("Entra Altura") : value; ;
             }
         }
-
-        public Persona(string nombre, string dNaixement, string nif, char sexe, double pes, double alçada)
-        {
-            this.Nombre = nombre;
-            this.DNaixement = dNaixement;
-            this.Nif = nif;
-            this.Sexe = sexe;
-            this.Pes = pes;
-            this.Alçada = alçada;
+        #endregion
+        #region Contructores
+        public Persona()
+        {//constructor sin parametros
         }
+        public Persona(string nif)
+        {
+            this.nif = (nifCorrecte(nif)) ? nif : "Nif Invalido";
+        }
+        public Persona(string nom, string dataNaixement, char sexe)
+        {
+            this.nom = nom;
+            this.dataNaixement = dataNaixement;
+            this.sexe = sexe;
+        }
+        public Persona(string nom, string dataNaixement, string nif, char sexe, double pes, double alçada)
+        {
+            this.nom = nom;
+            this.dataNaixement = dataNaixement;
+            this.nif = (nifCorrecte(nif)) ? nif : "Nif Invalido";
+            this.sexe = sexe;
+            this.pes = pes;
+            this.alçada = alçada;
+        }
+        #endregion
+        #region metodes privats
+        private static bool nifCorrecte(string nif)
+        {
+            char lletra = '.';
+            bool trobat = false;
+            int maxIndiceNif = nif.Length - 1;
+            int numero = 0;
+            try
+            {
+                numero = Int32.Parse(nif.Substring(0, maxIndiceNif));
+                lletra = nif[maxIndiceNif].ToString().ToUpper()[0];
+            }
+            catch (Exception) { }
+            return trobat = (lletraM(numero, lletra)) ? true : false; ;
+        }
+
+        static bool lletraM(int numero, char lletra)
+        {
+            string lletresDNI = "TRWAGMYFPDXBNJZSQVHLCKE";
+            return (lletra == lletresDNI[numero % 23]) ? true : false;
+        }
+
+
+
+        #endregion
+        #region override
+        public override string ToString()
+        {
+            string cadena = "Datos de la Persona:" +
+                "\nNom: " + nom +
+                "\nData Naixement: " + dataNaixement +
+                "\nNif: " + nif +
+                "\nSexe: " + sexe +
+                "\npes: " + pes +
+                "\nalçada: " + alçada;
+
+            return cadena;
+        }
+        #endregion
     }
 }

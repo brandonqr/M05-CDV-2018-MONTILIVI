@@ -39,7 +39,15 @@ namespace PracticaPersona
         }
         public bool esMajorEdat()
         {
-            return (edat() > 18) ? true : false;
+            bool retornar = false;
+            if(edat() > 18)
+            {
+                retornar = true;
+            }
+            else{
+                retornar = false;
+            }
+            return retornar;
         }
 
 

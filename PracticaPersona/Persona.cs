@@ -8,6 +8,7 @@ namespace PracticaPersona
 {
     class Persona
     {
+        //Éste es un comentario para probar el pull :D
         //atributos
         private string nom = "";
         private string dataNaixement = "";
